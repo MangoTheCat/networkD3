@@ -36,6 +36,8 @@
 #' to accomodate long text labels.
 #' @param height numeric height for the network graph's frame area in pixels.
 #' @param width numeric width for the network graph's frame area in pixels.
+#' @param iterations number iterations to perform in the node placement
+#' optimization.
 #'
 #' @examples
 #' \dontrun{
@@ -70,7 +72,7 @@ sankeyNetwork <- function(Links, Nodes, Source, Target, Value,
     NodeID, NodeGroup = NodeID, LinkGroup = NULL, units = "", 
     colourScale = JS("d3.scale.category20()"), fontSize = 7, 
     fontFamily = NULL, nodeWidth = 15, nodePadding = 10, margin = NULL, 
-    height = NULL, width = NULL) {
+    height = NULL, width = NULL, iterations = 32) {
     # Hack for UI consistency. Think of improving.
     colourScale <- as.character(colourScale)
     
@@ -118,7 +120,7 @@ sankeyNetwork <- function(Links, Nodes, Source, Target, Value,
     options = list(NodeID = NodeID, NodeGroup = NodeGroup, LinkGroup = LinkGroup, 
         colourScale = colourScale, fontSize = fontSize, fontFamily = fontFamily, 
         nodeWidth = nodeWidth, nodePadding = nodePadding, units = units, 
-        margin = margin)
+        margin = margin, iterations = iterations)
     
     # create widget
     htmlwidgets::createWidget(name = "sankeyNetwork", x = list(links = LinksDF, 
