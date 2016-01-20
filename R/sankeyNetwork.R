@@ -69,10 +69,10 @@
 #' @export
 
 sankeyNetwork <- function(Links, Nodes, Source, Target, Value, 
-    NodeID, NodeGroup = NodeID, LinkGroup = NULL, units = "", 
-    colourScale = JS("d3.scale.category20()"), fontSize = 7, 
-    fontFamily = NULL, nodeWidth = 15, nodePadding = 10, margin = NULL, 
-    height = NULL, width = NULL, iterations = 32) {
+    NodeID, NodeGroup = NodeID, LinkGroup = NULL, Label = NULL,
+    TopLabel = NULL, units = "", colourScale = JS("d3.scale.category20()"),
+    fontSize = 7, fontFamily = NULL, nodeWidth = 15, nodePadding = 10,
+    margin = NULL, height = NULL, width = NULL, iterations = 32) {
     # Hack for UI consistency. Think of improving.
     colourScale <- as.character(colourScale)
     
@@ -109,7 +109,15 @@ sankeyNetwork <- function(Links, Nodes, Source, Target, Value,
     if (is.character(NodeGroup)) {
         NodesDF$group <- Nodes[, NodeGroup]
     }
+
+    if (is.character(Label)) {
+        NodesDF$label <- Nodes[, Label]
+    }
     
+    if (is.character(TopLabel)) {
+        NodesDF$toplabel <- Nodes[, TopLabel]
+    }
+
     if (is.character(LinkGroup)) {
         LinksDF$group <- Links[, LinkGroup]
     }

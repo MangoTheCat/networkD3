@@ -56,8 +56,8 @@ HTMLWidgets.widget({
         });        
 
         // get the width and height
-        var width = el.getBoundingClientRect().width - margin.right - margin.left;
-        var height = el.getBoundingClientRect().height - margin.top - margin.bottom;
+        var height = el.getBoundingClientRect().width - margin.right - margin.left;
+        var width = el.getBoundingClientRect().height - margin.top - margin.bottom;
 
         var color = eval(options.colourScale);
         
@@ -102,7 +102,9 @@ HTMLWidgets.widget({
         d3.select(el).select("svg").selectAll("*").remove();
         // append g for our container to transform by margin
         var svg = d3.select(el).select("svg").append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");;
+            .attr("transform",
+		  "translate(" + margin.left + "," + margin.top + ")" +
+		  "rotate(90," + width/2 + "," + height/2 + ")");
 
         // draw path
         var path = sankey.link();
@@ -116,7 +118,7 @@ HTMLWidgets.widget({
         
         link
             .attr("d", path)
-            .style("stroke-width", function(d) { return Math.max(1, d.dy); })
+            .style("stroke-width", function(d) { return d.dy; })
             .style("fill", "none")
             .style("stroke", color_link)
             .style("stroke-opacity", opacity_link)
@@ -152,7 +154,8 @@ HTMLWidgets.widget({
 
         // note: u2192 is right-arrow
         link.append("title")
-            .text(function(d) { return d.source.name + " \u2192 " + d.target.name +
+            .text(function(d) { return (d.source.label || d.source.name) +
+		" \u2192 " + (d.target.label || d.target.name) +
                 "\n" + format(d.value) + " " + options.units; });
 
         node.append("rect")
@@ -168,21 +171,26 @@ HTMLWidgets.widget({
                 " " + options.units; });
 
         node.append("text")
-            .attr("x", -6)
-            .attr("y", function(d) { return d.dy / 2; })
-            .attr("dy", ".35em")
-            .attr("text-anchor", "end")
-            .attr("transform", null)
-            .text(function(d) { return d.name; })
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("text-anchor", "middle")
+	    .attr("transform", function(d) { return "rotate(-90) translate(" + -d.dy/2 + ",20)" })
+            .text(function(d) { return d.label || d.name; })
             .style("font-size", options.fontSize + "px")
-            .style("font-family", options.fontFamily ? options.fontFamily : "inherit")
-            .filter(function(d) { return d.x < width / 2; })
-            .attr("x", 6 + sankey.nodeWidth())
-            .attr("text-anchor", "start");
-            
-            
+            .style("font-family", options.fontFamily ? options.fontFamily : "inherit");
+
+	node.append("text")
+	    .attr("x", 0)
+            .attr("y", 0)
+	    .attr("text-anchor", "start")
+	    .attr("transform", function(d) { return "rotate(-90) translate(" + -d.dy + ",-10)" })
+	    .text(function(d) { return d.toplabel })
+            .style("font-size", options.fontSize + "px")
+            .style("font-family", options.fontFamily ? options.fontFamily : "inherit");
+
         // adjust viewBox to fit the bounds of our tree
         var s = d3.select(svg[0][0].parentNode);
+	s.attr("viewBox", null);
         s.attr(
             "viewBox",
             [
@@ -218,7 +226,6 @@ HTMLWidgets.widget({
               ) + margin.top + margin.bottom
             ].join(",")
           );        
-        
 
         function dragmove(d) {
             d3.select(this).attr("transform", "translate(" + d.x + "," +
